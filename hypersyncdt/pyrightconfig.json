@@ -1,0 +1,24 @@
+{
+  "include": [
+    "frontend",
+    "backend"
+  ],
+  "exclude": [
+    "**/node_modules",
+    "**/__pycache__",
+    "**/venv",
+    "**/new_venv"
+  ],
+  "ignore": [
+    "frontend/__pycache__"
+  ],
+  "defineConstant": {
+    "DEBUG": true
+  },
+  "venvPath": "/opt/homebrew/Caskroom/miniforge/base",
+  "pythonVersion": "3.9",
+  "typeCheckingMode": "basic",
+  "useLibraryCodeForTypes": true,
+  "reportMissingImports": "warning",
+  "reportMissingTypeStubs": "none"
+} 

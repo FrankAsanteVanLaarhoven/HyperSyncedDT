@@ -1,0 +1,38 @@
+version: '3.8'
+
+services:
+  frontend:
+    image: hyper-synced-dt-frontend
+    build: ./frontend
+    ports:
+      - "8501:8501"  # Streamlit runs on port 8501
+    depends_on:
+      backend:
+        condition: service_healthy
+    healthcheck:
+      test: ["CMD", "curl", "-f", "http://localhost:8501"]
+      interval: 30s
+      timeout: 10s
+      retries: 3
+      start_period: 10s
+    restart: unless-stopped
+    environment:
+      - STREAMLIT_SERVER_PORT=8501
+      - STREAMLIT_SERVER_HEADLESS=true
+
+  backend:
+    image: hyper-synced-dt-backend
+    build: ./backend
+    ports:
+      - "8000:8000"  # FastAPI runs on port 8000
+    volumes:
+      - ./database:/app/database  # Mount SQLite database
+    command: ["uvicorn", "main:app", "--host", "0.0.0.0", "--port", "8000"]
+    healthcheck:
+      test: ["CMD", "curl", "-f", "http://localhost:8000"]
+      interval: 30s
+      timeout: 10s
+      retries: 3
+      start_period: 10s
+    restart: unless-stopped
+    working_dir: /app
