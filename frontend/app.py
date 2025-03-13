@@ -1763,125 +1763,81 @@ def render_factory_dashboard():
             margin-bottom: 5px !important;
             letter-spacing: 0.5px !important;
         }
-        
-        /* Fix button layout in columns */
-        .stButton {
-            width: 100%;
-            margin: 5px 0;
-        }
-        
-        /* Add spacing between columns */
-        .row-widget.stHorizontal {
-            gap: 15px;
-        }
-        
-        button[kind="secondary"]:hover {
-            background-color: rgba(42, 46, 69, 0.9) !important;
-            transform: translateY(-3px) !important; /* Reduced movement */
-            box-shadow: 0 6px 12px rgba(0, 0, 0, 0.3) !important;
-            border: 1px solid rgba(100, 100, 200, 0.5) !important;
-        }
-        
-        /* Make button text larger and use horizontal layout */
-        button[kind="secondary"] p {
-            font-size: 20px !important;
-            line-height: 1.3 !important;
-            margin: 0 !important;
-            white-space: normal !important;
-            padding: 0 !important;
-        }
-        
-        /* Adjust icon and text alignment */
-        button[kind="secondary"] p {
-            display: flex;
-            align-items: center;
-            gap: 8px;
-            justify-content: center;
-        }
-        
-        /* Action description text */
-        .action-description {
-            color: rgba(200, 200, 220, 0.8);
-            text-align: center;
-            padding-top: 10px;
-            font-size: 14px;
-            margin-bottom: 20px;
-        }
         </style>
     """, unsafe_allow_html=True)
     
-    # Initialize factory components if not in session state
-    if 'factory_components' not in st.session_state:
-        st.session_state.factory_components = FactoryComponents()
+    # Import the live metrics module
+    from live_metrics import render_live_metrics
     
-    # Add Quick Actions & Active Screens section
-    st.markdown("<h2 class='quick-actions-title'>Quick Actions & Active Screens</h2>", unsafe_allow_html=True)
+    # Create a two-column layout
+    col1, col2 = st.columns([2, 1])
     
-    # Add a container with padding for the buttons
-    st.markdown("""
-    <div style="padding: 5px 0 20px 0; width: 100%;">
-    """, unsafe_allow_html=True)
-    
-    # Create a 4-column grid for the action buttons with more spacing
-    col1, col2, col3, col4 = st.columns([1, 1, 1, 1])
-    
-    # Define the action buttons with real functionality - icon and text side by side
     with col1:
-        if st.button("⚡   Optimize", key="optimize_button", use_container_width=True):
-            st.session_state.optimize_clicked = True
-            
-        # Add descriptive text below the button
-        st.markdown("<div class='action-description'>Run optimization</div>", unsafe_allow_html=True)
-        
+        # Render the live metrics dashboard
+        render_live_metrics()
+    
     with col2:
-        if st.button("🔄   Refresh", key="refresh_button", use_container_width=True):
-            st.session_state.refresh_clicked = True
-            st.rerun()  # Refresh the app
-            
-        # Add descriptive text below the button
-        st.markdown("<div class='action-description'>Update data</div>", unsafe_allow_html=True)
+        # Quick Actions Section
+        st.markdown('<h3 class="quick-actions-title">Quick Actions</h3>', unsafe_allow_html=True)
         
-    with col3:
-        if st.button("📊   Report", key="report_button", use_container_width=True):
-            st.session_state.report_clicked = True
-            
-        # Add descriptive text below the button
-        st.markdown("<div class='action-description'>Generate analytics</div>", unsafe_allow_html=True)
+        if st.button("🚀 Optimize System", use_container_width=True):
+            with st.spinner("Optimizing system parameters..."):
+                time.sleep(2)
+                st.success("System optimized! Efficiency increased by 3.2%")
+                # Set the clicked state
+                st.session_state.optimize_clicked = True
+                
+        if st.button("🔄 Refresh Data", use_container_width=True):
+            with st.spinner("Refreshing data from all sources..."):
+                time.sleep(1.5)
+                st.success("Data refreshed successfully!")
+                # Set the clicked state
+                st.session_state.refresh_clicked = True
+                
+        if st.button("📊 Generate Report", use_container_width=True):
+            with st.spinner("Generating comprehensive report..."):
+                time.sleep(2.5)
+                st.success("Report generated and sent to stakeholders!")
+                # Set the clicked state
+                st.session_state.report_clicked = True
+                
+        if st.button("⚙️ System Settings", use_container_width=True):
+            with st.spinner("Loading system settings..."):
+                time.sleep(1)
+                # Trigger navigation to settings
+                st.session_state.settings_clicked = True
+                st.session_state.current_page = "Settings"
+                st.rerun()
         
-    with col4:
-        if st.button("⚙️   Settings", key="settings_button", use_container_width=True):
-            # Navigate to settings page
-            st.session_state.settings_clicked = True
-            
-        # Add descriptive text below the button
-        st.markdown("<div class='action-description'>Configure system</div>", unsafe_allow_html=True)
-    
-    # Close the container div
-    st.markdown("</div>", unsafe_allow_html=True)
-    
-    # Handle button actions
-    if st.session_state.get("optimize_clicked", False):
-        st.success("Optimization started. Processing parameters...")
-        st.session_state.optimize_clicked = False
-        
-    if st.session_state.get("report_clicked", False):
-        st.info("Generating comprehensive report. Please wait...")
-        # Simulate report generation
-        with st.spinner("Processing data..."):
-            time.sleep(2)
-        st.success("Report generated successfully!")
-        st.session_state.report_clicked = False
-        
-    if st.session_state.get("settings_clicked", False):
-        st.session_state.settings_clicked = False
-        # Redirect to settings page
-        render_settings()
-        return  # Skip rest of dashboard to show settings
-    
-    # Add some space after the buttons
-    st.markdown("<br>", unsafe_allow_html=True)
-    
-    # Render the factory dashboard using the new modern design
+        # Notifications Section
+        st.markdown("""
+        <div style="background: rgba(25, 30, 50, 0.6); border-radius: 10px; padding: 15px; margin-top: 20px; border: 1px solid rgba(100, 120, 200, 0.2);">
+            <h3 style="font-size: 1.2rem; color: rgba(200, 220, 255, 0.9); margin-bottom: 10px;">Recent Notifications</h3>
+            <div style="background: rgba(40, 45, 70, 0.7); border-radius: 8px; padding: 10px; margin-bottom: 8px; border-left: 3px solid #4CAF50;">
+                <div style="display: flex; justify-content: space-between;">
+                    <span style="font-weight: 500; color: rgba(200, 220, 255, 0.9);">System Update Complete</span>
+                    <span style="font-size: 0.8rem; color: rgba(180, 190, 220, 0.7);">10 min ago</span>
+                </div>
+                <p style="margin: 5px 0 0 0; font-size: 0.9rem; color: rgba(180, 190, 220, 0.8);">All systems updated to latest version.</p>
+            </div>
+            <div style="background: rgba(40, 45, 70, 0.7); border-radius: 8px; padding: 10px; margin-bottom: 8px; border-left: 3px solid #FFC107;">
+                <div style="display: flex; justify-content: space-between;">
+                    <span style="font-weight: 500; color: rgba(200, 220, 255, 0.9);">Maintenance Scheduled</span>
+                    <span style="font-size: 0.8rem; color: rgba(180, 190, 220, 0.7);">1 hour ago</span>
+                </div>
+                <p style="margin: 5px 0 0 0; font-size: 0.9rem; color: rgba(180, 190, 220, 0.8);">Planned maintenance on Mar 15, 2025.</p>
+            </div>
+            <div style="background: rgba(40, 45, 70, 0.7); border-radius: 8px; padding: 10px; border-left: 3px solid #2196F3;">
+                <div style="display: flex; justify-content: space-between;">
+                    <span style="font-weight: 500; color: rgba(200, 220, 255, 0.9);">New Feature Available</span>
+                    <span style="font-size: 0.8rem; color: rgba(180, 190, 220, 0.7);">3 hours ago</span>
+                </div>
+                <p style="margin: 5px 0 0 0; font-size: 0.9rem; color: rgba(180, 190, 220, 0.8);">YouTube streaming is now available.</p>
+            </div>
+        </div>
+        """, unsafe_allow_html=True)
+
+    # The factory components dashboard is handled by our component
     st.session_state.factory_components.render_factory_dashboard()
 
 def render_provider_management():
