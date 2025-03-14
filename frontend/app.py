@@ -1,6 +1,12 @@
 import streamlit as st
 import importlib
 import sys
+import pandas as pd
+import numpy as np
+import time
+from datetime import datetime, timedelta
+from factory_components import FactoryComponents
+from live_metrics import render_live_metrics  # Add this import
 
 # Force reload the components module to pick up changes
 if 'components.interactive_header' in sys.modules:
@@ -27,6 +33,11 @@ with main_container:
     header_container = st.container()
     with header_container:
         st.session_state.header.render()
+        
+    # Add live metrics dashboard
+    metrics_container = st.container()
+    with metrics_container:
+        render_live_metrics()
 
 # Auto-refresh script
 st.markdown("""
@@ -1729,6 +1740,10 @@ def render_digital_twin_simulation():
 
 def render_factory_dashboard():
     """Render the main factory dashboard with modern design."""
+    # Initialize factory components if not in session state
+    if 'factory_components' not in st.session_state:
+        st.session_state.factory_components = FactoryComponents()
+        
     st.markdown("""
         <style>
         .stApp {
