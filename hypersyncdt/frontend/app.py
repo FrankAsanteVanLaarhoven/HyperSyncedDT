@@ -8,6 +8,15 @@ st.set_page_config(
     initial_sidebar_state="expanded"
 )
 
+# Health check endpoint
+def health_check():
+    if st.experimental_get_query_params().get("healthz"):
+        st.write("OK")
+        st.stop()
+
+# Call health check at the start
+health_check()
+
 # Standard library imports
 import importlib
 import sys
