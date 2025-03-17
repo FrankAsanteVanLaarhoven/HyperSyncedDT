@@ -1,0 +1,1 @@
+web: streamlit run hypersyncdt/frontend/app.py 
