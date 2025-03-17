@@ -112,13 +112,13 @@ from typing import Dict, List, Optional
 from qiskit import QuantumCircuit
 from qiskit_aer import Aer
 from qiskit.primitives import StatevectorSampler
-from advanced_visualization_page import render_advanced_visualization_page
-from research_roadmap import render_research_roadmap
-from tool_wear_analysis import render_tool_wear_analysis
-from eda_workspace import render_eda_workspace, EDAWorkspace
-from provider_management import render_provider_management
-from model_performance import render_model_performance
-from rag_assistant import render_rag_assistant
+# from advanced_visualization_page import render_advanced_visualization_page
+# from research_roadmap import render_research_roadmap
+# from tool_wear_analysis import render_tool_wear_analysis
+# from eda_workspace import render_eda_workspace, EDAWorkspace
+# from provider_management import render_provider_management
+# from model_performance import render_model_performance
+# from rag_assistant import render_rag_assistant
 from factory_components import (
     render_factory_connect,
     render_factory_build,
@@ -139,23 +139,23 @@ from concurrent.futures import ThreadPoolExecutor
 import h5py
 import tensorly as tl
 from pathlib import Path
-from digital_twin_components import (
+# from digital_twin_components import (
     MachineConnector,
     DigitalTwinVisualizer,
     CameraManager,
     SensorProcessor
 )
 import asyncio
-from rag_agent_creator import render_rag_agent_creator
-from tool_condition_monitoring import render_tool_condition_monitoring
-from wear_pattern_recognition import render_wear_pattern_recognition
-from tool_life_prediction import render_tool_life_prediction
-from virtual_testing import render_virtual_testing
-from process_simulation import render_process_simulation
-from what_if_analysis import render_what_if_analysis
-from experiment_tracking import render_experiment_tracking
+# from rag_agent_creator import render_rag_agent_creator
+# from tool_condition_monitoring import render_tool_condition_monitoring
+# from wear_pattern_recognition import render_wear_pattern_recognition
+# from tool_life_prediction import render_tool_life_prediction
+# from virtual_testing import render_virtual_testing
+# from process_simulation import render_process_simulation
+# from what_if_analysis import render_what_if_analysis
+# from experiment_tracking import render_experiment_tracking
 import requests
-from research_roadmap import render_research_roadmap
+# from research_roadmap import render_research_roadmap
 # Import the live dashboard module
 
 # Monkey patch for PyTorch custom class issue
@@ -1317,15 +1317,15 @@ def render_tool_wear():
     ])
     
     with tab1:
-        from tool_condition_monitoring import render_tool_condition_monitoring
+        # from tool_condition_monitoring import render_tool_condition_monitoring
         render_tool_condition_monitoring()
     
     with tab2:
-        from tool_life_prediction import render_tool_life_prediction
+        # from tool_life_prediction import render_tool_life_prediction
         render_tool_life_prediction()
     
     with tab3:
-        from wear_pattern_recognition import render_wear_pattern_recognition
+        # from wear_pattern_recognition import render_wear_pattern_recognition
         render_wear_pattern_recognition()
 
 def render_copilot():
