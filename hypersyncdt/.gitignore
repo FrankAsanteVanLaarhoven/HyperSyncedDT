@@ -4,7 +4,6 @@ __pycache__/
 *$py.class
 *.so
 .Python
-env/
 build/
 develop-eggs/
 dist/
@@ -16,14 +15,19 @@ lib64/
 parts/
 sdist/
 var/
+wheels/
 *.egg-info/
 .installed.cfg
 *.egg
 
 # Virtual Environment
 venv/
+env/
 ENV/
 .env
+.venv
+.env.*
+!.env.example
 
 # IDE
 .idea/
@@ -31,8 +35,31 @@ ENV/
 *.swp
 *.swo
 
-# OS specific
+# OS
 .DS_Store
+Thumbs.db
+
+# Project specific
+*.h5
+*.hdf5
+*.parquet
+*.feather
+logs/
+data/
+models/*.joblib
+models/*.pkl
+
+# Testing
+.coverage
+htmlcov/
+.pytest_cache/
+.tox/
+nosetests.xml
+coverage.xml
+*.cover
+.hypothesis/
+
+# OS specific
 .DS_Store?
 ._*
 .Spotlight-V100
