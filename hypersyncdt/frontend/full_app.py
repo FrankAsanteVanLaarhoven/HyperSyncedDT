@@ -8,22 +8,32 @@ import os
 
 # Add the current directory to the path so imports work
 current_dir = os.path.dirname(os.path.abspath(__file__))
+parent_dir = os.path.dirname(os.path.dirname(current_dir))
 sys.path.append(current_dir)
-sys.path.append(os.path.join(os.path.dirname(current_dir), '..'))
+sys.path.append(parent_dir)
 
 # Import the modern dashboard UI
 from components.modern_ui import ModernDashboardUI
 
-# Import other required components
+# Import local project components with proper path handling
 try:
     from components.factory_components import (
         FactoryComponents, 
         OperatorCoPilot,
         AgentFactory,
-        SelfCalibratingShadow
+        SelfCalibratingShadow,
+        render_factory_connect,
+        render_factory_build,
+        render_factory_analyze,
+        render_factory_operate,
+        render_sustainability,
+        render_risk_mitigation,
+        render_copilot,
+        render_agent_factory
     )
     factory_components_available = True
-except ImportError:
+except ImportError as e:
+    st.warning(f"Failed to import factory components: {e}")
     factory_components_available = False
     
 try:
@@ -35,11 +45,56 @@ try:
         SynchronizedDigitalTwin
     )
     digital_twin_available = True
-except ImportError:
+except ImportError as e:
+    st.warning(f"Failed to import digital twin components: {e}")
     digital_twin_available = False
+    
+try:
+    from components.live_metrics import render_live_metrics
+    live_metrics_available = True
+except ImportError as e:
+    st.warning(f"Failed to import live metrics: {e}")
+    live_metrics_available = False
+    
+try:
+    from components.advanced_visualizations import MultiModalVisualizer
+    advanced_viz_available = True
+except ImportError as e:
+    advanced_viz_available = False
+
+try:
+    from components.interactive_header import AdvancedInteractiveHeader
+    interactive_header_available = True
+except ImportError as e:
+    interactive_header_available = False
 
 # Initialize the dashboard UI
 dashboard = ModernDashboardUI()
+
+# Initialize session state for components
+if factory_components_available and 'factory' not in st.session_state:
+    st.session_state.factory = FactoryComponents()
+    
+if factory_components_available and 'copilot' not in st.session_state:
+    st.session_state.copilot = OperatorCoPilot()
+    
+if factory_components_available and 'agent_factory' not in st.session_state:
+    st.session_state.agent_factory = AgentFactory()
+    
+if factory_components_available and 'shadow' not in st.session_state:
+    st.session_state.shadow = SelfCalibratingShadow()
+    
+if digital_twin_available and 'machine_connector' not in st.session_state:
+    st.session_state.machine_connector = MachineConnector()
+    
+if digital_twin_available and 'digital_twin' not in st.session_state:
+    st.session_state.digital_twin = SynchronizedDigitalTwin()
+    
+if advanced_viz_available and 'visualizer' not in st.session_state:
+    st.session_state.visualizer = MultiModalVisualizer()
+    
+if interactive_header_available and 'header' not in st.session_state:
+    st.session_state.header = AdvancedInteractiveHeader()
 
 # Configure the page with dark theme
 st.set_page_config(
@@ -108,14 +163,14 @@ st.markdown("""
 with st.sidebar:
     st.title("HyperSyncDT")
     st.markdown("## Select Role")
-    role = st.selectbox("", ["Operator", "Administrator", "Maintenance", "Supervisor"], label_visibility="collapsed")
+    role = st.selectbox("Role", ["Operator", "Administrator", "Maintenance", "Supervisor"], label_visibility="collapsed")
     
     st.markdown("## NAVIGATE TO")
     st.markdown("### Category")
-    category = st.selectbox("", ["Factory Operations", "Digital Twin", "Maintenance", "Analytics"], key="category_select", label_visibility="collapsed")
+    category = st.selectbox("Category", ["Factory Operations", "Digital Twin", "Maintenance", "Analytics"], key="category_select", label_visibility="collapsed")
     
     st.markdown("### Page")
-    page = st.selectbox("", ["Factory Connect", "Factory Build", "Factory Analyze", "Factory Operate"], key="page_select", label_visibility="collapsed")
+    page = st.selectbox("Page", ["Factory Connect", "Factory Build", "Factory Analyze", "Factory Operate"], key="page_select", label_visibility="collapsed")
     
     col1, col2 = st.columns(2)
     with col1:
@@ -178,7 +233,7 @@ with main_container:
         </div>
         """, unsafe_allow_html=True)
     
-    # System metrics
+    # System metrics - Use metrics from factory_components if available
     metrics_col1, metrics_col2, metrics_col3, metrics_col4 = st.columns(4)
     
     with metrics_col1:
@@ -196,67 +251,161 @@ with main_container:
     # Advanced Metrics
     st.markdown("## Advanced Metrics")
     
+    # Use factory metrics if available
+    efficiency = "88.5%"
+    quality_score = "95.1"
+    throughput = "781 units"
+    utilization = "79.8%"
+    
+    if factory_components_available and hasattr(st.session_state, 'factory'):
+        factory = st.session_state.factory
+        if hasattr(factory, 'metrics') and 'production' in factory.metrics:
+            efficiency = f"{factory.metrics['production'].get('efficiency', 0.885) * 100:.1f}%"
+            quality_score = f"{factory.metrics['production'].get('quality_rate', 0.951) * 100:.1f}"
+            utilization = f"{factory.metrics['resources'].get('utilization', 0.798) * 100:.1f}%"
+            throughput = f"{factory.metrics['production'].get('units_produced', 781)} units"
+    
     adv_col1, adv_col2 = st.columns(2)
     
     with adv_col1:
-        dashboard.render_advanced_metric_card("Efficiency", "88.5%", color="green")
+        dashboard.render_advanced_metric_card("Efficiency", efficiency, color="green")
         
     with adv_col2:
-        dashboard.render_advanced_metric_card("Quality Score", "95.1", color="green")
+        dashboard.render_advanced_metric_card("Quality Score", quality_score, color="green")
         
     adv_col3, adv_col4 = st.columns(2)
     
     with adv_col3:
-        dashboard.render_advanced_metric_card("Throughput", "781 units", color="green")
+        dashboard.render_advanced_metric_card("Throughput", throughput, color="green")
         
     with adv_col4:
-        dashboard.render_advanced_metric_card("Utilization", "79.8%", color="green")
+        dashboard.render_advanced_metric_card("Utilization", utilization, color="green")
+    
+    # Integrate factory visualizations if available
+    if factory_components_available:
+        st.markdown("## Factory Operations")
+        
+        if page == "Factory Connect" and 'factory' in st.session_state:
+            render_factory_connect()
+        elif page == "Factory Build" and 'factory' in st.session_state:
+            render_factory_build()
+        elif page == "Factory Analyze" and 'factory' in st.session_state:
+            render_factory_analyze()
+        elif page == "Factory Operate" and 'factory' in st.session_state:
+            render_factory_operate()
     
     # Real-time monitoring
     st.markdown("## Real-Time Monitoring")
     
-    tabs = st.tabs(["System Performance", "Resource Usage", "Temperature", "Response Time", "Errors"])
+    if live_metrics_available:
+        # Use the project's live metrics if available
+        render_live_metrics()
+    else:
+        # Fall back to our mock implementation
+        tabs = st.tabs(["System Performance", "Resource Usage", "Temperature", "Response Time", "Errors"])
+        
+        with tabs[0]:
+            # Create sample CPU usage data
+            dates = pd.date_range(start=datetime.now() - timedelta(hours=24), end=datetime.now(), freq='1h')
+            cpu_values = np.random.uniform(30, 70, size=len(dates))
+            target_values = np.ones(len(dates)) * 60
+            
+            fig = go.Figure()
+            
+            # Add CPU usage line
+            fig.add_trace(go.Scatter(
+                x=dates,
+                y=cpu_values,
+                mode='lines',
+                name='CPU Usage',
+                line=dict(color='#3498db', width=2)
+            ))
+            
+            # Add target line
+            fig.add_trace(go.Scatter(
+                x=dates,
+                y=target_values,
+                mode='lines',
+                name='Target',
+                line=dict(color='#e74c3c', width=2, dash='dash')
+            ))
+            
+            fig.update_layout(
+                title="CPU Usage Over Time",
+                xaxis_title="Time",
+                yaxis_title="Percentage",
+                yaxis=dict(range=[0, 100]),
+                legend=dict(orientation="h", yanchor="bottom", y=1.02, xanchor="right", x=1),
+                height=400,
+                margin=dict(l=20, r=20, t=50, b=20),
+                plot_bgcolor='#121212',
+                paper_bgcolor='#121212',
+                font=dict(color='#CCCCCC')
+            )
+            
+            st.plotly_chart(fig, use_container_width=True)
     
-    with tabs[0]:
-        # Create sample CPU usage data
-        dates = pd.date_range(start=datetime.now() - timedelta(hours=24), end=datetime.now(), freq='1h')
-        cpu_values = np.random.uniform(30, 70, size=len(dates))
-        target_values = np.ones(len(dates)) * 60
+    # Display operator recommendations if available
+    if factory_components_available and 'copilot' in st.session_state:
+        st.markdown("## Operator Recommendations")
+        recommendations = st.session_state.copilot.get_recommendations()
         
-        fig = go.Figure()
+        rec_data = []
+        for rec in recommendations:
+            rec_data.append({
+                "Priority": rec['priority'],
+                "Type": rec['type'],
+                "Message": rec['message'],
+                "Impact": rec['impact']
+            })
         
-        # Add CPU usage line
-        fig.add_trace(go.Scatter(
-            x=dates,
-            y=cpu_values,
-            mode='lines',
-            name='CPU Usage',
-            line=dict(color='#3498db', width=2)
-        ))
+        rec_df = pd.DataFrame(rec_data)
+        st.dataframe(rec_df, use_container_width=True)
+    
+    # Display machine information if available
+    if digital_twin_available and 'machine_connector' in st.session_state and 'digital_twin' in st.session_state:
+        st.markdown("## Machine Information")
         
-        # Add target line
-        fig.add_trace(go.Scatter(
-            x=dates,
-            y=target_values,
-            mode='lines',
-            name='Target',
-            line=dict(color='#e74c3c', width=2, dash='dash')
-        ))
+        # Get machine list
+        machines = st.session_state.machine_connector.machine_specs
         
-        fig.update_layout(
-            title="CPU Usage Over Time",
-            xaxis_title="Time",
-            yaxis_title="Percentage",
-            yaxis=dict(range=[0, 100]),
-            legend=dict(orientation="h", yanchor="bottom", y=1.02, xanchor="right", x=1),
-            height=400,
-            margin=dict(l=20, r=20, t=50, b=20),
-            plot_bgcolor='#121212',
-            paper_bgcolor='#121212',
-            font=dict(color='#CCCCCC')
-        )
+        # Display machine table
+        machine_data = []
+        for machine_id, specs in machines.items():
+            machine_data.append({
+                "Machine ID": machine_id,
+                "Type": specs.type,
+                "Model": specs.model,
+                "Status": np.random.choice(["Operational", "Maintenance", "Standby"])
+            })
         
-        st.plotly_chart(fig, use_container_width=True)
+        machine_df = pd.DataFrame(machine_data)
+        st.dataframe(machine_df, use_container_width=True)
+        
+        # Show maintenance recommendations for selected machine
+        selected_machine = "MHI-M8"
+        
+        if hasattr(st.session_state.digital_twin, 'get_maintenance_recommendations'):
+            recommendations = st.session_state.digital_twin.get_maintenance_recommendations(selected_machine)
+            
+            st.markdown(f"### Maintenance Recommendations for {selected_machine}")
+            
+            if recommendations:
+                rec_data = []
+                for rec in recommendations:
+                    rec_data.append({
+                        "Component": rec['component'],
+                        "Issue": rec['issue'],
+                        "Current Value": rec['current_value'],
+                        "Threshold": rec['threshold'],
+                        "Priority": rec['priority'],
+                        "Recommendation": rec['recommendation']
+                    })
+                
+                rec_df = pd.DataFrame(rec_data)
+                st.dataframe(rec_df, use_container_width=True)
+            else:
+                st.info("No maintenance recommendations at this time.")
     
     # System Alerts
     with st.expander("System Alerts", expanded=True):
