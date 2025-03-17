@@ -9,10 +9,10 @@ from factory_components import FactoryComponents
 from live_metrics import render_live_metrics  # Add this import
 
 # Force reload the components module to pick up changes
-if 'components.interactive_header' in sys.modules:
-    importlib.reload(sys.modules['components.interactive_header'])
+# if 'components.interactive_header' in sys.modules:
+#     importlib.reload(sys.modules['components.interactive_header'])
 
-from components.interactive_header import AdvancedInteractiveHeader
+from hypersyncdt.frontend.components.interactive_header import AdvancedInteractiveHeader
 
 # Set page configuration at the very beginning - must be called first
 st.set_page_config(

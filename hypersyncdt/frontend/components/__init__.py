@@ -1,3 +1,5 @@
+# Empty __init__.py file to make the directory a proper Python package
+
 from .advanced_visualizations import MultiModalVisualizer
 from .advanced_visualization_page import render_advanced_visualization_page
 from .research_roadmap import render_research_roadmap
