@@ -12,7 +12,17 @@ import random
 import time
 # New imports for 3D visualization and Redis
 import plotly.io as pio
-from streamlit_plotly_events import plotly_events
+
+# Handle optional plotly events import
+try:
+    from streamlit_plotly_events import plotly_events
+    HAS_PLOTLY_EVENTS = True
+except ImportError:
+    HAS_PLOTLY_EVENTS = False
+    def plotly_events(fig, *args, **kwargs):
+        st.warning("Interactive events are disabled. Install streamlit-plotly-events for full functionality.")
+        st.plotly_chart(fig, use_container_width=True)
+        return []
 import requests
 import base64
 import re  # Add import for regular expressions
