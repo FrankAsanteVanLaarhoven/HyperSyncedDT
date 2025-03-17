@@ -12,7 +12,11 @@ from live_metrics import render_live_metrics  # Add this import
 # if 'components.interactive_header' in sys.modules:
 #     importlib.reload(sys.modules['components.interactive_header'])
 
-from hypersyncdt.frontend.components.interactive_header import AdvancedInteractiveHeader
+# Import AdvancedInteractiveHeader with exact path that works in Render
+import os
+import sys
+sys.path.append(os.path.dirname(os.path.abspath(__file__)))
+from components.interactive_header import AdvancedInteractiveHeader
 
 # Set page configuration at the very beginning - must be called first
 st.set_page_config(
