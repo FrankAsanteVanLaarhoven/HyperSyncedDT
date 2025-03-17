@@ -271,6 +271,15 @@ with main_container:
         dashboard.render_advanced_metric_card("Efficiency", efficiency, color="green")
         
     with adv_col2:
+        # Add percentage sign for quality score to ensure proper handling
+        if quality_score and not quality_score.endswith("%"):
+            try:
+                # Check if it's already a percentage value
+                value = float(quality_score)
+                if value > 0 and value <= 100:
+                    quality_score = f"{value}%"
+            except:
+                pass
         dashboard.render_advanced_metric_card("Quality Score", quality_score, color="green")
         
     adv_col3, adv_col4 = st.columns(2)
