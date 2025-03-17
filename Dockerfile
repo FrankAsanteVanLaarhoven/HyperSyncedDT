@@ -22,5 +22,5 @@ RUN mkdir -p models database
 # Expose the port
 EXPOSE 8501
 
-# Run the Streamlit application
-CMD ["streamlit", "run", "hypersyncdt/frontend/app.py", "--server.port=8501", "--server.address=0.0.0.0"]
+# Run the minimal Streamlit application
+CMD ["streamlit", "run", "hypersyncdt/frontend/minimal_app.py", "--server.port=8501", "--server.address=0.0.0.0"]
