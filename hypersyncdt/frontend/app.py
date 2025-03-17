@@ -3,6 +3,13 @@ import pandas as pd
 import numpy as np
 import plotly.graph_objects as go
 from datetime import datetime, timedelta
+import sys
+import os
+
+# Add the current directory to the path so imports work
+current_dir = os.path.dirname(os.path.abspath(__file__))
+sys.path.append(current_dir)
+sys.path.append(os.path.join(os.path.dirname(current_dir), '..'))
 
 # Set page configuration at the very beginning
 st.set_page_config(
@@ -21,6 +28,20 @@ from components.digital_twin_components import (
     SynchronizedDigitalTwin
 )
 
+try:
+    # Try to import the factory components
+    from components.factory_components import (
+        FactoryComponents, 
+        OperatorCoPilot,
+        AgentFactory,
+        SelfCalibratingShadow
+    )
+    factory_components_available = True
+except ImportError:
+    # If it fails, we'll use a minimal set of features
+    factory_components_available = False
+    st.warning("Factory components not available. Running with minimal feature set.")
+
 # Initialize session state objects
 if 'machine_connector' not in st.session_state:
     st.session_state.machine_connector = MachineConnector()
@@ -33,6 +54,12 @@ if 'visualizer' not in st.session_state:
 
 if 'sensor_processor' not in st.session_state:
     st.session_state.sensor_processor = SensorProcessor()
+
+if factory_components_available and 'factory' not in st.session_state:
+    st.session_state.factory = FactoryComponents()
+    
+if factory_components_available and 'copilot' not in st.session_state:
+    st.session_state.copilot = OperatorCoPilot()
 
 # Main app container
 main_container = st.container()
@@ -149,6 +176,26 @@ with main_container:
         st.dataframe(rec_df, use_container_width=True)
     else:
         st.info("No maintenance recommendations at this time.")
+    
+    # Show factory components if available
+    if factory_components_available:
+        st.markdown("## Factory Operations")
+        
+        # Show operator copilot recommendations
+        st.subheader("Operator CoPilot Recommendations")
+        recommendations = st.session_state.copilot.get_recommendations()
+        
+        rec_data = []
+        for rec in recommendations:
+            rec_data.append({
+                "Priority": rec['priority'],
+                "Type": rec['type'],
+                "Message": rec['message'],
+                "Impact": rec['impact']
+            })
+        
+        rec_df = pd.DataFrame(rec_data)
+        st.dataframe(rec_df, use_container_width=True)
         
     # Footer
     st.markdown("---")
