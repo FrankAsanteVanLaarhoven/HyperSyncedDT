@@ -28,7 +28,7 @@ class ModernDashboardUI:
         with header_col1:
             st.markdown("# HyperSyncDT")
             st.markdown("### Select Role")
-            role = st.selectbox("", ["Operator", "Administrator", "Maintenance", "Supervisor"], label_visibility="collapsed")
+            role = st.selectbox("Role", ["Operator", "Administrator", "Maintenance", "Supervisor"], label_visibility="collapsed")
             
         with header_col2:
             # Empty column for spacing
@@ -40,10 +40,10 @@ class ModernDashboardUI:
     def render_sidebar(self):
         st.markdown("## NAVIGATE TO")
         st.markdown("### Category")
-        category = st.selectbox("", ["Factory Operations", "Digital Twin", "Maintenance", "Analytics"], key="category_select", label_visibility="collapsed")
+        category = st.selectbox("Category", ["Factory Operations", "Digital Twin", "Maintenance", "Analytics"], key="category_select", label_visibility="collapsed")
         
         st.markdown("### Page")
-        page = st.selectbox("", ["Factory Connect", "Factory Build", "Factory Analyze", "Factory Operate"], key="page_select", label_visibility="collapsed")
+        page = st.selectbox("Page", ["Factory Connect", "Factory Build", "Factory Analyze", "Factory Operate"], key="page_select", label_visibility="collapsed")
         
         col1, col2 = st.columns(2)
         with col1:
@@ -187,22 +187,31 @@ class ModernDashboardUI:
         if isinstance(value, str):
             if "%" in value:
                 try:
-                    progress_value = float(value.replace("%", "")) / 100
+                    # Ensure value is between 0 and 1
+                    progress_value = min(1.0, max(0.0, float(value.replace("%", "")) / 100))
                 except:
                     pass
             elif "units" in value:
                 try:
-                    progress_value = float(value.replace(" units", "")) / 1000
+                    # Cap at 1.0 to ensure valid progress bar
+                    raw_value = float(value.replace(" units", ""))
+                    progress_value = min(1.0, max(0.0, raw_value / 1000))
                 except:
                     pass
             else:
                 try:
-                    progress_value = float(value) / 100
+                    # Assume value is already a percentage but without % sign
+                    # Cap at 1.0 to ensure valid progress bar
+                    raw_value = float(value)
+                    progress_value = min(1.0, max(0.0, raw_value / 100))
                 except:
                     pass
         
         st.markdown(f"##### {title}")
         st.markdown(f"<div style='color: {hex_color}; font-size: 28px; font-weight: bold;'>{value}</div>", unsafe_allow_html=True)
+        
+        # Add safety check to ensure progress value is always between 0.0 and 1.0
+        progress_value = min(1.0, max(0.0, progress_value))
         st.progress(progress_value, f"Progress for {title}")
     
     def render_real_time_monitoring(self):
@@ -272,9 +281,12 @@ class ModernDashboardUI:
             }
             return color_map.get(val, '')
         
+        # Use the newer .map() method instead of .applymap()
+        styled_df = alerts_df.style.map(highlight_priority, subset=['priority'])
+        
         # Display the styled dataframe
         st.dataframe(
-            alerts_df.style.applymap(highlight_priority, subset=['priority']),
+            styled_df,
             use_container_width=True,
             height=140
         )
